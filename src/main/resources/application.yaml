@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: spring-ai-chatbots
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY: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}
+
+server:
+  port: 8081
+
+logging:
+  level:
+    root: debug
+
+springdoc:
+  swagger-ui:
+    url: /swagger-ui.html

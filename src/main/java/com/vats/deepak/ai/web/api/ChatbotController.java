@@ -1,9 +1,10 @@
 package com.vats.deepak.ai.web.api;
 
-import com.vats.deepak.ai.beans.QuestionAnswerBean;
-import com.vats.deepak.ai.beans.QuestionBean;
+import com.vats.deepak.ai.beans.ChatbotRequest;
+import com.vats.deepak.ai.beans.ChatbotResponse;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,18 +14,21 @@ public class ChatbotController {
 
     private final ChatClient chatClient;
 
-    ChatbotController(ChatClient.Builder chatBuilder) {
+    public ChatbotController(ChatClient.Builder chatBuilder) {
         this.chatClient = chatBuilder.build();
     }
 
-    @PostMapping(value = {"/question-to-llm"})
-    public ResponseEntity<QuestionAnswerBean> getAnswer(@RequestBody QuestionBean question) {
-        String answer = this.chatClient
-                .prompt(question.getQuestion())
+    @PostMapping({"/api/chat"})
+    public ChatbotResponse getQuestion(@RequestBody ChatbotRequest request) {
+        //ChatOptions chatOptions = ChatOptions.builder().model("gpt-5.4-nano").build();
+        //Prompt prompt = new Prompt(request.question(), chatOptions);
+
+        //fluent api used (like builder pattern)
+        String answer = chatClient
+                //.prompt(prompt)
+                .prompt(request.question())
                 .call()
                 .content();
-        QuestionAnswerBean response = QuestionAnswerBean.builder().question(question.getQuestion()).answer(answer).build();
-        return ResponseEntity.ok(response);
+        return new ChatbotResponse(request.question(), answer);
     }
-
 }

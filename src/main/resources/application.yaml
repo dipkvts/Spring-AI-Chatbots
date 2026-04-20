@@ -4,9 +4,6 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY:your-key}
-      chat:
-        options:
-          model: gpt-5.4-mini
 
 server:
   port: 8081

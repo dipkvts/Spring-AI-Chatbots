@@ -20,13 +20,16 @@ public class ChatbotController {
 
     @PostMapping({"/api/chat"})
     public ChatbotResponse getQuestion(@RequestBody ChatbotRequest request) {
-        //ChatOptions chatOptions = ChatOptions.builder().model("gpt-5.4-nano").build();
-        //Prompt prompt = new Prompt(request.question(), chatOptions);
+        ChatOptions chatOptions = ChatOptions.builder()
+                .maxTokens(100) //Max 100 tokens in response
+                .temperature(0.5)
+                .build();
+        Prompt prompt = new Prompt(request.question(), chatOptions);
 
         //fluent api used (like builder pattern)
         String answer = chatClient
-                //.prompt(prompt)
-                .prompt(request.question())
+                .prompt(prompt)
+                //.prompt(request.question())
                 .call()
                 .content();
         return new ChatbotResponse(request.question(), answer);

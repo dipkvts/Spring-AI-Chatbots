@@ -41,17 +41,17 @@ public class ChatbotController {
 //                .call() //uses default model (gpt 4.0 mini), if not configured / specified
 //                .content(); //returns response, Actual AI provider api gets called at this moment
 
+        //Preparing for Context memory
         List<Message> msgList = new ArrayList<>();
         msgList.add(new SystemMessage("You are my personal assistant."));
         msgList.add(new UserMessage(request.question()));
         msgList.add(new AssistantMessage("Welcome Mr. Deepak Vats. Nice to meet you."));
         msgList.add(new UserMessage("Do you remember me ?"));
-
         Prompt msgPrompt = new Prompt(msgList);
 
         String answer = chatClient
                 //.prompt(request.question())
-                //.prompt(prompt)
+                //.prompt(prompt) //added context memory
                 .prompt(msgPrompt)
                 .call() //uses default model (gpt 4.0 mini), if not configured / specified
                 .chatResponse() //Adding metadata by using ChatRssponse

@@ -1,9 +1,15 @@
 spring:
   application:
     name: spring-ai-chatbots
+
   ai:
     openai:
       api-key: ${OPENAI_API_KEY:your-key}
+      chat:
+        options:
+          model: gpt-5.4-mini
+          max-completion-tokens: 100 # max output token
+          temperature: 0.5
 
 server:
   port: 8081

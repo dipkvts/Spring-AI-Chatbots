@@ -21,9 +21,10 @@ public class ChatbotAPI {
     public ResponseEntity<QuestionAnswerBean> getAnswer(@RequestBody QuestionBean question) {
         String answer = this.chatClient
                 .prompt(question.getQuestion())
-                .call() //calls default model (gpt 4.0 mini)
-                .content(); //returned response
+                .call() //uses default model (gpt 4.0 mini), if not configured / specified
+                .content(); //returns response, Actual AI provider api gets called at this moment
         QuestionAnswerBean response = QuestionAnswerBean.builder().question(question.getQuestion()).answer(answer).build();
+        //.builder().setQuestion(-): Wrong
         return ResponseEntity.ok(response);
     }
 

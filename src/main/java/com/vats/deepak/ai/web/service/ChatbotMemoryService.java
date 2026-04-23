@@ -33,6 +33,7 @@ public class ChatbotMemoryService {
         return  newMessages;
     }
 
+    //system msg is set only once for entire session
     public void addSystemMessage(String sessionId, String systemMessage){
         List<Message> messageList = new ArrayList<>();
         messageList.add(new SystemMessage(systemMessage));

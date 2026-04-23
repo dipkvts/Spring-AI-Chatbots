@@ -33,10 +33,9 @@ public class ChatbotController {
 
     @PostMapping(value = {"/api/chat"})
     public ChatbotResponse askQuestion(@RequestBody ChatbotRequest chatbotRequest) {
-
         String sessionId = chatbotRequest.sessionId();
 
-        // step-1: check new session or not
+        // step-1: check new session or not, if not then fetch entire history
         boolean isExistedSession = chatMemoryService.isExistedSession(sessionId);
         List<Message> previousChatHistory = new ArrayList<>();
         if (isExistedSession) {
@@ -44,8 +43,9 @@ public class ChatbotController {
         }else{
             chatMemoryService.addSystemMessage(sessionId, systemMessage);
         }
-        var newChatMessage = new ArrayList<>(previousChatHistory);
 
+        //Before sending a new request to llm, past chat history is added to new chat query
+        var newChatMessage = new ArrayList<>(previousChatHistory);
         newChatMessage.add(new UserMessage(chatbotRequest.question()));
 
         Prompt prompt = new Prompt(newChatMessage);
@@ -54,12 +54,12 @@ public class ChatbotController {
                         .prompt(prompt)
                         .call()
                         .chatResponse()
-                        .getResult().
-                        getOutput().
-                        getText();
+                        .getResult()
+                        .getOutput()
+                        .getText();
 
+        //After receiving response from llm, user msg and assistant msg is added to chat history
         chatMemoryService.addChatHistory(sessionId, chatbotRequest.question(), assistantAnswer);
-
         return new ChatbotResponse(chatbotRequest.question(), assistantAnswer);
     }
 

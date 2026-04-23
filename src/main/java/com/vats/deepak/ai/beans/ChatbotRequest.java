@@ -1,4 +1,4 @@
 package com.vats.deepak.ai.beans;
 
-public record ChatbotRequest(String question) {
+public record ChatbotRequest(String question, String sessionId) {
 }

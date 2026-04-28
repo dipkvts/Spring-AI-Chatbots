@@ -44,15 +44,17 @@ public class ChatbotAdvisorsController {
         var chatRequest = this.inMemoryChatClient
                 .prompt()
                 .system(systemMessage)
-                .user(chatbotRequest.question());
+                .user(chatbotRequest.question())
+                .advisors(advisror -> advisror.param(ChatMemory.CONVERSATION_ID, chatbotRequest.sessionId());
+                //Replaced default session id with programmer defined session id to have control over it
+                //Now u need to pass sessionID parameter also during api call
 
-        String assistantAnswer =
-                chatRequest
-                        .call()
-                        .chatResponse()
-                        .getResult()
-                        .getOutput()
-                        .getText();
+        String assistantAnswer = chatRequest
+                .call()
+                .chatResponse()
+                .getResult()
+                .getOutput()
+                .getText();
 
         return new ChatbotResponse(chatbotRequest.question(), assistantAnswer);
     }

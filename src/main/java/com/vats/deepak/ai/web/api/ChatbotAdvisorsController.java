@@ -29,7 +29,7 @@ public class ChatbotAdvisorsController {
         var messageChatMemoryAdvisor = MessageChatMemoryAdvisor //injects conversation history in prompt
                 .builder(chatMemory)
                 .build();
-        //Step-2: create ChatClient with adavisor
+        //Step-2: create ChatClient with Advisor
         this.inMemoryChatClient = ChatClient
                 .builder(openAiChatModel)
                 .defaultAdvisors(messageChatMemoryAdvisor) //created ChatClient with Advisors

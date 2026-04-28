@@ -41,11 +41,13 @@ public class ChatbotAdvisorsController {
 
     @PostMapping(value = {"/api/advisor/chat"})
     public ChatbotResponse askQuestion(@RequestBody ChatbotRequest chatbotRequest) {
+        var chatRequest = this.inMemoryChatClient
+                .prompt()
+                .system(systemMessage)
+                .user(chatbotRequest.question());
+
         String assistantAnswer =
-                this.inMemoryChatClient
-                        .prompt()
-                        .system(systemMessage)
-                        .user(chatbotRequest.question())
+                chatRequest
                         .call()
                         .chatResponse()
                         .getResult()

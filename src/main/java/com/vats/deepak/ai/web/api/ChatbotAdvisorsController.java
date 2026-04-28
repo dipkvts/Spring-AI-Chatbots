@@ -3,21 +3,18 @@ package com.vats.deepak.ai.web.api;
 
 import com.vats.deepak.ai.beans.ChatbotRequest;
 import com.vats.deepak.ai.beans.ChatbotResponse;
-import com.vats.deepak.ai.web.service.ChatbotMemoryService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.server.DelegatingServerHttpResponse;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ChatbotAdvisorsController {
@@ -32,7 +29,7 @@ public class ChatbotAdvisorsController {
         var messageChatMemoryAdvisor = MessageChatMemoryAdvisor //injects conversation history in prompt
                 .builder(chatMemory)
                 .build();
-        //Step-2: create ChatClient with aadavisor
+        //Step-2: create ChatClient with adavisor
         this.inMemoryChatClient = ChatClient
                 .builder(openAiChatModel)
                 .defaultAdvisors(messageChatMemoryAdvisor) //created ChatClient with Advisors
@@ -41,11 +38,12 @@ public class ChatbotAdvisorsController {
 
     @PostMapping(value = {"/api/advisor/chat"})
     public ChatbotResponse askQuestion(@RequestBody ChatbotRequest chatbotRequest) {
+        //No manual code written for chat history fetch pre-request
         var chatRequest = this.inMemoryChatClient
                 .prompt()
                 .system(systemMessage)
                 .user(chatbotRequest.question())
-                .advisors(advisror -> advisror.param(ChatMemory.CONVERSATION_ID, chatbotRequest.sessionId());
+                .advisors(advisror -> advisror.param(ChatMemory.CONVERSATION_ID, chatbotRequest.sessionId()));
                 //Replaced default session id with programmer defined session id to have control over it
                 //Now u need to pass sessionID parameter also during api call
 
@@ -55,7 +53,22 @@ public class ChatbotAdvisorsController {
                 .getResult()
                 .getOutput()
                 .getText();
+        //No manual code written for chat history update post-response
 
         return new ChatbotResponse(chatbotRequest.question(), assistantAnswer);
+    }
+
+    @DeleteMapping(value = {"/api/advisor/chat/{sessionId}"})
+    public Map<String, Boolean> deleteConversation(@PathVariable String sessionId) {
+        Map<String, Boolean> responseMap = new HashMap<>();
+        chatMemory.clear(sessionId);
+        List<Message> conversationList = chatMemory.get(sessionId);
+        if(CollectionUtils.isEmpty(conversationList)) {
+            responseMap.put("IsConversationDeleted", true);
+        } else {
+            responseMap.put("IsConversationDeleted", false);
+        }
+
+        return responseMap;
     }
 }

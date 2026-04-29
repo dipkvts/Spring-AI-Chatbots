@@ -8,7 +8,6 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.http.server.DelegatingServerHttpResponse;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +22,7 @@ public class ChatbotAdvisorsController {
 
     private final String systemMessage = "You are my personal assistant";
 
-    public ChatbotAdvisorsController(OpenAiChatModel openAiChatModel, ChatMemory chatMemory, ChatMemory chatMemory1) {
+    public ChatbotAdvisorsController(OpenAiChatModel openAiChatModel, ChatMemory chatMemory) {
         this.chatMemory = chatMemory;
         //Step-1: prepare ChatMemory advisor
         var messageChatMemoryAdvisor = MessageChatMemoryAdvisor //injects conversation history in prompt
@@ -38,7 +37,7 @@ public class ChatbotAdvisorsController {
 
     @PostMapping(value = {"/api/advisor/chat"})
     public ChatbotResponse askQuestion(@RequestBody ChatbotRequest chatbotRequest) {
-        //No manual code written for chat history fetch pre-request
+        //No manual code written to fetch chat history (pre-request task)
         var chatRequest = this.inMemoryChatClient
                 .prompt()
                 .system(systemMessage)
@@ -53,7 +52,7 @@ public class ChatbotAdvisorsController {
                 .getResult()
                 .getOutput()
                 .getText();
-        //No manual code written for chat history update post-response
+        //No manual code written to update chat history (post-response task)
 
         return new ChatbotResponse(chatbotRequest.question(), assistantAnswer);
     }
